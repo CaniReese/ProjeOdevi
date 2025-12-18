@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "Randevu Al";
+}
+
+<h2>Randevu Al</h2>
+
+<form asp-action="Create" method="post" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Antrenör</label>
+        <select class="form-select" name="trainerId" asp-items="ViewBag.Trainers"></select>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Hizmet</label>
+        <select class="form-select" name="serviceTypeId" asp-items="ViewBag.Services"></select>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Başlangıç</label>
+        <input class="form-control" type="datetime-local" name="startDateTime" required />
+    </div>
+
+    <div class="col-12">
+        <div class="text-danger">
+            @Html.ValidationSummary()
+        </div>
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-primary" type="submit">Gönder (Onay Bekler)</button>
+    </div>
+</form>
+@section Scripts {
+<script>
+    async function loadServices(trainerId) {
+        const res = await fetch(`/Appointments/ServicesByTrainer?trainerId=${trainerId}`);
+        const data = await res.json();
+
+        const serviceSelect = document.querySelector('select[name="serviceTypeId"]');
+        serviceSelect.innerHTML = "";
+
+        for (const s of data) {
+            const opt = document.createElement("option");
+            opt.value = s.serviceTypeId;
+            opt.textContent = s.name;
+            serviceSelect.appendChild(opt);
+        }
+    }
+
+    const trainerSelect = document.querySelector('select[name="trainerId"]');
+    trainerSelect.addEventListener("change", () => loadServices(trainerSelect.value));
+
+    // sayfa açılınca ilk trainer için yükle
+    if (trainerSelect.value) loadServices(trainerSelect.value);
+</script>
+}

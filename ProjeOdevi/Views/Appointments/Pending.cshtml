@@ -1,0 +1,43 @@
+﻿@model List<ProjeOdevi.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Bekleyen Randevular";
+}
+
+<h2>Bekleyen Randevular</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Antrenör</th>
+            <th>Hizmet</th>
+            <th>Ücret</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var a in Model)
+    {
+        <tr>
+            <td>@a.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+            <td>@a.Trainer?.FullName</td>
+            <td>@a.ServiceType?.Name</td>
+            <td>@a.PriceSnapshot.ToString("0.00")</td>
+            <td class="d-flex gap-2">
+                <form asp-action="Approve" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@a.Id" />
+                    <button class="btn btn-success btn-sm" type="submit">Onayla</button>
+                </form>
+
+                <form asp-action="Reject" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@a.Id" />
+                    <button class="btn btn-danger btn-sm" type="submit">Reddet</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

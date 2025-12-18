@@ -1,0 +1,36 @@
+﻿@model List<ProjeOdevi.Models.Appointment>
+@using ProjeOdevi.Models
+
+@{
+    ViewData["Title"] = "Randevularım";
+}
+
+<h2>Randevularım</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Antrenör</th>
+            <th>Hizmet</th>
+            <th>Ücret</th>
+            <th>Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var a in Model)
+    {
+        <tr>
+            <td>@a.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+            <td>@a.Trainer?.FullName</td>
+            <td>@a.ServiceType?.Name</td>
+            <td>@a.PriceSnapshot.ToString("0.00")</td>
+            <td>
+                @if (a.Status == AppointmentStatus.Pending) { <span class="badge bg-warning text-dark">Bekliyor</span> }
+                else if (a.Status == AppointmentStatus.Approved) { <span class="badge bg-success">Onaylandı</span> }
+                else { <span class="badge bg-danger">Reddedildi</span> }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

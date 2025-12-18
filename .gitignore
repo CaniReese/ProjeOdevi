@@ -1,0 +1,12 @@
+# Visual Studio
+.vs/
+**/.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Secrets / config
+appsettings.Development.json
