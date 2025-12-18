@@ -1,0 +1,34 @@
+﻿@model ProjeOdevi.Models.AiPlanRequest
+
+<h2>AI Koç – Kişisel Egzersiz Planı</h2>
+
+<form method="post">
+    <div class="mb-2">
+        <label>Yaş</label>
+        <input asp-for="Age" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Boy (cm)</label>
+        <input asp-for="Height" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Kilo (kg)</label>
+        <input asp-for="Weight" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Hedef</label>
+        <select asp-for="Goal" class="form-control">
+            <option>Kilo Vermek</option>
+            <option>Kas Yapmak</option>
+            <option>Formda Kalmak</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary">AI Plan Oluştur</button>
+</form>
+
+@if (ViewBag.Result != null)
+{
+    <hr />
+    <pre>@ViewBag.Result</pre>
+}
