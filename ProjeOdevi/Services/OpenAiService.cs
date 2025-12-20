@@ -1,50 +1,40 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
+﻿using OpenAI.Chat;
 
 namespace ProjeOdevi.Services
 {
     public class OpenAiService
     {
-        private readonly IConfiguration _config;
-        private readonly HttpClient _http;
+        private readonly ChatClient _chat;
 
         public OpenAiService(IConfiguration config)
         {
-            _config = config;
-            _http = new HttpClient();
+            var apiKey = config["OpenAI:ApiKey"];
+            var model = config["OpenAI:Model"] ?? "gpt-4o-mini"; // istersen değiştir
+
+            _chat = new ChatClient(model: model, apiKey: apiKey);
         }
 
-        public async Task<string> GenerateExercisePlan(string prompt)
+        public async Task<string> CreateWorkoutPlanAsync(int age, int heightCm, int weightKg, string goal)
         {
-            var apiKey = _config["OpenAI:ApiKey"];
-            var model = _config["OpenAI:Model"] ?? "gpt-4o-mini";
+            string prompt = $"""
+            Kullanıcı bilgileri:
+            - Yaş: {age}
+            - Boy: {heightCm} cm
+            - Kilo: {weightKg} kg
+            - Hedef: {goal}
 
-            _http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", apiKey);
+            7 günlük egzersiz planı üret.
+            Her gün için:
+            - Isınma
+            - Ana antrenman (set/tekrar)
+            - Soğuma
+            En sona kısa beslenme önerisi ekle.
+            Türkçe yaz, madde madde yaz.
+            """;
 
-            var body = new
-            {
-                model = model,
-                messages = new[]
-                {
-                    new { role = "user", content = prompt }
-                }
-            };
-
-            var response = await _http.PostAsync(
-                "https://api.openai.com/v1/chat/completions",
-                new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json")
-            );
-
-            var json = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
-
-            return doc.RootElement
-                .GetProperty("choices")[0]
-                .GetProperty("message")
-                .GetProperty("content")
-                .GetString();
+            // İstersen direkt string de verebilirsin:
+            ChatCompletion completion = await _chat.CompleteChatAsync(prompt);
+            return completion.Content[0].Text;
         }
     }
 }

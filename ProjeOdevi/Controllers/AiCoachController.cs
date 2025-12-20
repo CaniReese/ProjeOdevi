@@ -1,36 +1,36 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using ProjeOdevi.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using ProjeOdevi.Services;
 
-[Authorize]
-public class AiCoachController : Controller
+namespace ProjeOdevi.Controllers
 {
-    private readonly OpenAiService _ai;
-
-    public AiCoachController(OpenAiService ai)
+    public class AiCoachController : Controller
     {
-        _ai = ai;
-    }
+        private readonly OpenAiService _openAi;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public AiCoachController(OpenAiService openAi)
+        {
+            _openAi = openAi;
+        }
 
-    [HttpPost]
-    public async Task<IActionResult> Index(AiPlanRequest model)
-    {
-        var prompt = $"""
-        Yaş: {model.Age}
-        Boy: {model.Height} cm
-        Kilo: {model.Weight} kg
-        Hedef: {model.Goal}
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
 
-        Bu bilgilerle haftalık bir egzersiz planı hazırla.
-        """;
+        [HttpPost]
+        public async Task<IActionResult> Index(int age, int heightCm, int weightKg, string goal)
+        {
+            if (age <= 0 || heightCm <= 0 || weightKg <= 0 || string.IsNullOrWhiteSpace(goal))
+            {
+                ViewBag.Error = "Lütfen yaş / boy / kilo ve hedef alanlarını doldurun.";
+                return View();
+            }
 
-        ViewBag.Result = await _ai.GenerateExercisePlan(prompt);
-        return View();
+            var plan = await _openAi.CreateWorkoutPlanAsync(age, heightCm, weightKg, goal);
+            ViewBag.Plan = plan;
+
+            return View();
+        }
     }
 }
